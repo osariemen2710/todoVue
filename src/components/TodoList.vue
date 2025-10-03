@@ -30,6 +30,12 @@
         <input v-model="searchQuery" class="form-input" placeholder="Search..." />
       </div>
 
+      <div class="filter-buttons">
+        <button @click="setFilter('all')" :class="['btn', currentFilter === 'all' ? 'btn-primary' : 'btn-secondary']">All</button>
+        <button @click="setFilter('completed')" :class="['btn', currentFilter === 'completed' ? 'btn-primary' : 'btn-secondary']">Completed</button>
+        <button @click="setFilter('uncompleted')" :class="['btn', currentFilter === 'uncompleted' ? 'btn-primary' : 'btn-secondary']">Pending</button>
+      </div>
+
       <div v-if="loading" class="text-center">Loading...</div>
 
       <div v-else-if="todos.length === 0" class="card no-todos-message">
@@ -70,6 +76,7 @@ type Todo = {
   detail?: string | null;
   inserted_at?: string;
 };
+type FilterStatus = 'all' | 'completed' | 'uncompleted';
 
 const user = ref<any | null>(null);
 const todos = ref<Todo[]>([]);
@@ -81,6 +88,7 @@ const message = ref('');
 const newTitle = ref('');
 
 const searchQuery = ref('');
+const currentFilter = ref<FilterStatus>('all');
 const currentPage = ref(1);
 const todosPerPage = 8;
 const totalTodos = ref(0);
@@ -112,6 +120,12 @@ async function fetchTodos() {
     query = query.ilike('title', `%${searchQuery.value}%`);
   }
 
+  if (currentFilter.value === 'completed') {
+    query = query.eq('completed', true);
+  } else if (currentFilter.value === 'uncompleted') {
+    query = query.eq('completed', false);
+  }
+
   const { data, error, count } = await query;
 
   loading.value = false;
@@ -139,6 +153,12 @@ function setupRealtime() {
 }
 
 // --- ACTIONS ---
+function setFilter(filter: FilterStatus) {
+  currentFilter.value = filter;
+  currentPage.value = 1;
+  fetchTodos();
+}
+
 async function addTodo() {
   if (!user.value || !newTitle.value.trim()) return;
   adding.value = true;
@@ -153,7 +173,16 @@ async function addTodo() {
 
 async function deleteTodo(t: Todo) {
   const { error } = await supabase.from('todos').delete().eq('id', t.id);
-  if (error) console.error('Delete error', error);
+  if (error) {
+    console.error('Delete error', error);
+    return;
+  }
+
+  if (todos.value.length === 1 && currentPage.value > 1) {
+    currentPage.value--;
+  }
+
+  fetchTodos();
 }
 
 async function signIn() {
@@ -236,6 +265,12 @@ watch(searchQuery, () => {
 .new-todo .form-input { flex-grow: 1; }
 
 .search-bar { margin-bottom: 1.5rem; }
+
+.filter-buttons {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
 
 .no-todos-message { text-align: center; padding: 3rem 1rem; }
 .no-todos-message h3 { margin: 0 0 0.5rem 0; }
