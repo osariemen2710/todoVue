@@ -21,10 +21,11 @@
         </div>
       </div>
 
-      <div class="new-todo card">
-        <input v-model="newTitle" class="form-input" placeholder="Add a new todo..." @keyup.enter="addTodo" />
-        <button @click="addTodo" :disabled="adding" class="btn btn-primary">{{ adding ? '...' : 'Add' }}</button>
-      </div>
+      <form @submit.prevent="addTodo" class="new-todo card">
+        <input v-model="newTitle" class="form-input" placeholder="Add a new todo title..." />
+        <textarea v-model="newDetail" class="form-input" placeholder="Add some details... (optional)" rows="3"></textarea>
+        <button type="submit" :disabled="adding" class="btn btn-primary">{{ adding ? '...' : 'Add' }}</button>
+      </form>
 
       <div class="search-bar">
         <input v-model="searchQuery" class="form-input" placeholder="Search..." />
@@ -89,6 +90,7 @@ const authLoading = ref(false);
 const email = ref('');
 const message = ref('');
 const newTitle = ref('');
+const newDetail = ref('');
 
 const searchQuery = ref('');
 const currentFilter = ref<FilterStatus>('all');
@@ -165,12 +167,18 @@ function setFilter(filter: FilterStatus) {
 async function addTodo() {
   if (!user.value || !newTitle.value.trim()) return;
   adding.value = true;
-  const { error } = await supabase.from('todos').insert({ user_id: user.value.id, title: newTitle.value.trim(), completed: false });
+  const { error } = await supabase.from('todos').insert({
+    user_id: user.value.id,
+    title: newTitle.value.trim(),
+    detail: newDetail.value.trim(),
+    completed: false
+  });
   adding.value = false;
   if (error) {
     console.error('Insert error', error);
   } else {
     newTitle.value = '';
+    newDetail.value = '';
   }
 }
 
@@ -264,8 +272,13 @@ watch(searchQuery, () => {
 .header h2 { margin: 0; }
 .user-actions { display:flex; gap:0.5rem; align-items:center; }
 
-.new-todo { display:flex; gap:0.5rem; margin-bottom: 1.5rem; padding: 1rem; }
-.new-todo .form-input { flex-grow: 1; }
+.new-todo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+}
 
 .search-bar { margin-bottom: 1.5rem; }
 
