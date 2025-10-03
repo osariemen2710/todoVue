@@ -89,7 +89,8 @@ label {
   margin-bottom: 0.5rem;
   font-size: 1rem;
 }
-input[type="text"] {
+input[type="text"],
+textarea {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 10px;
@@ -98,7 +99,8 @@ input[type="text"] {
   font-size: 1rem;
   transition: all 0.2s;
 }
-input[type="text"]:focus {
+input[type="text"]:focus,
+textarea:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
