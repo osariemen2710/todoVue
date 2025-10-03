@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.26.0",
+    "sonner": "^2.0.7",
     "vue": "^3.3.4",
     "vue-router": "^4.5.1"
   },

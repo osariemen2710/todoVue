@@ -67,6 +67,7 @@ type Todo = {
   user_id: string;
   title: string;
   completed: boolean;
+  detail?: string | null;
   inserted_at?: string;
 };
 
@@ -215,7 +216,7 @@ onMounted(async () => {
   });
 });
 
-let searchTimeout: number;
+let searchTimeout: ReturnType<typeof setTimeout>;
 watch(searchQuery, () => {
   currentPage.value = 1;
   clearTimeout(searchTimeout);

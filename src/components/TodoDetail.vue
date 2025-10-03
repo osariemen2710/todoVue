@@ -5,6 +5,8 @@
       <p :class="['status', todo.completed ? 'completed' : 'incomplete']">
         Status: {{ todo.completed ? 'Completed' : 'Incomplete' }}
       </p>
+      <p class="todo-detail" v-if="todo.detail && todo.detail.length">{{ todo.detail }}</p>
+      <p v-else class="todo-detail muted">No details provided.</p>
       <div class="actions">
         <router-link :to="{ name: 'TodoEdit', params: { id } }" class="btn btn-primary">Edit</router-link>
         <router-link :to="{ name: 'TodoList' }" class="btn btn-secondary">Back to List</router-link>

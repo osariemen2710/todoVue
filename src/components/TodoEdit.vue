@@ -8,6 +8,10 @@
           <input id="title" type="text" v-model="todo.title" />
         </div>
         <div class="form-group">
+          <label for="detail">Details</label>
+          <textarea id="detail" v-model="todo.detail" rows="4"></textarea>
+        </div>
+        <div class="form-group">
           <label class="checkbox-label">
             <input type="checkbox" v-model="todo.completed" />
             <span>Completed</span>
@@ -40,7 +44,7 @@ async function saveTodo() {
   saving.value = true;
   const { error } = await supabase
     .from('todos')
-    .update({ title: todo.value.title, completed: todo.value.completed })
+    .update({ title: todo.value.title, completed: todo.value.completed, detail: todo.value.detail ?? '' })
     .eq('id', props.id);
   saving.value = false;
   if (error) {
