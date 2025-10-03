@@ -46,6 +46,8 @@
       <ul v-else class="todos">
         <li v-for="t in todos" :key="t.id" class="todo-item card">
           <router-link :to="{ name: 'TodoDetail', params: { id: t.id } }" class="todo-link">
+            <CircleCheck v-if="t.completed" :size="20" class="status-icon completed" />
+            <Circle v-else :size="20" class="status-icon pending" />
             <span :class="{ done: t.completed }">{{ t.title }}</span>
           </router-link>
           <button @click.stop.prevent="deleteTodo(t)" class="btn-danger">&times;</button>
@@ -66,6 +68,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { Circle, CircleCheck } from 'lucide-vue-next';
 
 // --- STATE ---
 type Todo = {
@@ -275,13 +278,19 @@ watch(searchQuery, () => {
 .no-todos-message { text-align: center; padding: 3rem 1rem; }
 .no-todos-message h3 { margin: 0 0 0.5rem 0; }
 
-.todos { list-style: none; padding: 0; margin: 0; }
+.todos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
 .todo-item { 
   display:flex; 
   justify-content: space-between; 
   align-items:center; 
   padding: 1rem; 
-  margin-bottom: 0.75rem;
   transition: all 0.2s;
 }
 .todo-item:hover { transform: translateY(-2px); box-shadow: 0 4px 20px -5px rgba(0,0,0,0.15); }
@@ -292,8 +301,20 @@ watch(searchQuery, () => {
   flex-grow: 1;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 .todo-link .done { text-decoration: line-through; color:#9ca3af; }
+
+.status-icon {
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+.status-icon.completed {
+  color: #22c55e;
+}
+.status-icon.pending {
+  color: #9ca3af;
+}
 
 .btn-danger {
   background: transparent;
